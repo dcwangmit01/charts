@@ -94,10 +94,10 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         ports:
-        - containerPort: 9300
+        - containerPort: {{ .Values.cluster.service.ports.transport }}
           name: transport
 {{ if .Values.data.exposeHttp }}
-        - containerPort: 9200
+        - containerPort: {{ .Values.cluster.service.ports.http }}
           name: http
 {{ end }}
         resources:
@@ -105,7 +105,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /_cluster/health?local=true
-            port: 9200
+            port: {{ .Values.cluster.service.ports.http }}
           initialDelaySeconds: 5
         volumeMounts:
         - mountPath: /usr/share/elasticsearch/data

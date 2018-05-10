@@ -118,12 +118,12 @@ data:
 
     echo "Prepare to migrate data of the node"
 
-    NODE_STATS=$(curl -s -XGET 'http://localhost:9200/_nodes/stats')
+    NODE_STATS=$(curl -s -XGET 'http://localhost:{{ .Values.cluster.service.ports.http }}/_nodes/stats')
     NODE_IP=$(echo "${NODE_STATS}" | jq -r ".nodes[] | select(.name==\"${HOSTNAME}\") | .host")
 
     echo "Move all data from node ${NODE_IP}"
 
-    curl -s -XPUT localhost:9200/_cluster/settings -d "{
+    curl -s -XPUT localhost:{{ .Values.cluster.service.ports.http }}/_cluster/settings -d "{
       \"transient\" :{
           \"cluster.routing.allocation.exclude._ip\" : \"${NODE_IP}\"
       }
@@ -133,17 +133,17 @@ data:
     echo "Wait for node to become empty"
     DOC_COUNT=$(echo "${NODE_STATS}" | jq ".nodes[] | select(.name==\"${HOSTNAME}\") | .indices.docs.count")
     while [ "${DOC_COUNT}" -gt 0 ]; do
-      NODE_STATS=$(curl -s -XGET 'http://localhost:9200/_nodes/stats')
+      NODE_STATS=$(curl -s -XGET 'http://localhost:{{ .Values.cluster.service.ports.http }}/_nodes/stats')
       DOC_COUNT=$(echo "${NODE_STATS}" | jq -r ".nodes[] | select(.name==\"${HOSTNAME}\") | .indices.docs.count")
       echo "Node contains ${DOC_COUNT} documents"
       sleep 1
     done
 
     echo "Wait for node shards to become empty"
-    SHARD_STATS=$(curl -s -XGET 'http://localhost:9200/_cat/shards?format=json')
+    SHARD_STATS=$(curl -s -XGET 'http://localhost:{{ .Values.cluster.service.ports.http }}/_cat/shards?format=json')
     SHARD_COUNT=$(echo "${SHARD_STATS}" | jq "[.[] | select(.node==\"${HOSTNAME}\")] | length")
     while [ "${SHARD_COUNT}" -gt 0 ]; do
-      SHARD_STATS=$(curl -s -XGET 'http://localhost:9200/_cat/shards?format=json')
+      SHARD_STATS=$(curl -s -XGET 'http://localhost:{{ .Values.cluster.service.ports.http }}/_cat/shards?format=json')
       SHARD_COUNT=$(echo "${SHARD_STATS}" | jq "[.[] | select(.node==\"${HOSTNAME}\")] | length")
       echo "Node contains ${SHARD_COUNT} shards"
       sleep 1

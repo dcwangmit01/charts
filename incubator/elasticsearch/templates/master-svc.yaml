@@ -11,7 +11,7 @@ metadata:
 spec:
   clusterIP: None
   ports:
-    - port: 9300
+    - port: {{ .Values.cluster.service.ports.transport }}
       targetPort: transport
   selector:
     app: {{ template "elasticsearch.name" . }}

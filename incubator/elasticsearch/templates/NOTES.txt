@@ -2,7 +2,7 @@ The elasticsearch cluster has been installed.
 
 Elasticsearch can be accessed:
 
-  * Within your cluster, at the following DNS name at port 9200:
+  * Within your cluster, at the following DNS name at port {{ .Values.cluster.service.ports.http }}:
 
     {{ template "elasticsearch.client.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
 
@@ -22,10 +22,10 @@ Elasticsearch can be accessed:
            You can watch the status of by running 'kubectl get svc -w {{ template "elasticsearch.client.fullname" . }}'
 
     export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "elasticsearch.client.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-    echo http://$SERVICE_IP:9200
+    echo http://$SERVICE_IP:{{ .Values.cluster.service.ports.http }}
     {{- else if contains "ClusterIP"  .Values.client.serviceType }}
 
     export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app={{ template "elasticsearch.name" . }},component={{ .Values.client.name }},release={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
-    echo "Visit http://127.0.0.1:9200 to use Elasticsearch"
-    kubectl port-forward --namespace {{ .Release.Namespace }} $POD_NAME 9200:9200
+    echo "Visit http://127.0.0.1:{{ .Values.cluster.service.ports.http }} to use Elasticsearch"
+    kubectl port-forward --namespace {{ .Release.Namespace }} $POD_NAME {{ .Values.cluster.service.ports.http }}:{{ .Values.cluster.service.ports.http }}
     {{- end }}

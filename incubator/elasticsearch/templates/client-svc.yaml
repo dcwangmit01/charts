@@ -16,10 +16,10 @@ metadata:
 spec:
   ports:
     - name: http
-      port: 9200
+      port: {{ .Values.cluster.service.ports.http }}
       targetPort: http
     - name: transport
-      port: 9300
+      port: {{ .Values.cluster.service.ports.transport }}
       targetPort: transport
   selector:
     app: {{ template "elasticsearch.name" . }}

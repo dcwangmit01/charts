@@ -88,19 +88,19 @@ spec:
         readinessProbe:
           httpGet:
             path: /_cluster/health?wait_for_status=yellow
-            port: 9200
+            port: {{ .Values.cluster.service.ports.http }}
           initialDelaySeconds: 5
         livenessProbe:
           httpGet:
             path: /_cluster/health?wait_for_status=yellow
-            port: 9200
+            port: {{ .Values.cluster.service.ports.http }}
           initialDelaySeconds: 90
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         ports:
-        - containerPort: 9200
+        - containerPort: {{ .Values.cluster.service.ports.http }}
           name: http
-        - containerPort: 9300
+        - containerPort: {{ .Values.cluster.service.ports.transport }}
           name: transport
         volumeMounts:
         - mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
